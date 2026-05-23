@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Labs - LAUC | Jacobian Matrix</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.7.0/math.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Light Mode (Default) */
+        :root {
+            --bg-body: #f8f9fa;
+            --text-primary: #333;
+            --bg-sidebar: white;
+            --bg-content: white;
+            --border-color: #eee;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            --formula-bg: #f0f7ff;
+            --step-bg: #f8f9fa;
+            --question-bg: #f8f9fa;
+            --contributor-bg: #f8f9fa;
+            --special-thanks-bg: #e8f4fc;
+        }
+
+        /* Dark Mode */
+        body.dark {
+            --bg-body: #1a1a2e;
+            --text-primary: #e0e0e0;
+            --bg-sidebar: #16213e;
+            --bg-content: #0f3460;
+            --border-color: #2c3e50;
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            --formula-bg: #1a2744;
+            --step-bg: #1a2744;
+            --question-bg: #1a2744;
+            --contributor-bg: #1a2744;
+            --special-thanks-bg: #1e3a5f;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, #2c3e50, #1a2530);
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .pcce-logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-right: 25px;
+            border-right: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .pcce-logo-img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            border-radius: 8px;
+            background-color: white;
+            padding: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .pcce-logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pcce-logo-text .main {
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+        }
+
+        .pcce-logo-text .sub {
+            font-size: 12px;
+            color: #ecf0f1;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .virtual-labs-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .virtual-labs-logo i {
+            font-size: 32px;
+            color: #3498db;
+        }
+
+        .virtual-labs-logo h1 {
+            font-size: 26px;
+            font-weight: 600;
+        }
+
+        .virtual-labs-logo span {
+            color: #3498db;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-info i {
+            font-size: 20px;
+            color: #3498db;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            margin-left: 15px;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Main Content Layout - Sidebar Column & Content Area */
+        .main-content {
+            display: flex;
+            margin-top: 30px;
+            gap: 30px;
+            min-height: 600px;
+        }
+
+        /* Sidebar Navigation - Column Form */
+        .sidebar {
+            flex: 0 0 300px;
+            background-color: var(--bg-sidebar);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            padding: 20px 0;
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar h3 {
+            padding: 0 20px 15px;
+            color: var(--text-primary);
+            border-bottom: 2px solid #3498db;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 14px 25px;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 1rem;
+            margin: 4px 0;
+            color: var(--text-primary);
+        }
+
+        .nav-item:hover {
+            background-color: var(--bg-body);
+            border-left-color: #3498db;
+        }
+
+        .nav-item.active {
+            background-color: var(--bg-body);
+            border-left-color: #3498db;
+            color: #3498db;
+            font-weight: 600;
+        }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        /* Content Area */
+        .content {
+            flex: 1;
+            background-color: var(--bg-content);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            padding: 30px;
+            min-height: 600px;
+            transition: background-color 0.3s ease;
+        }
+
+        .content-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .content-header h2 {
+            font-size: 28px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .content-header p {
+            color: var(--text-primary);
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        /* Dynamic Content Styles */
+        .theory-content, .simulation-content, .pretest-content, .posttest-content, 
+        .references-content, .contributors-content, .feedback-content-panel {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .formula-box {
+            background: var(--formula-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 18px;
+            overflow-x: auto;
+        }
+
+        .step-container {
+            background: var(--step-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-content);
+            color: var(--text-primary);
+            font-size: 14px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .symbolic-preview {
+            background: var(--formula-bg);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            font-size: 1.2rem;
+            border-left: 4px solid #3498db;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-hint {
+            background: #f39c12;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: var(--border-color);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #3498db;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .score-board {
+            background: #2c3e50;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .question-card {
+            background: var(--question-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+
+        .options label {
+            display: block;
+            margin: 12px 0;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+
+        .options label:hover {
+            background: var(--formula-bg);
+        }
+
+        .rating-stars i {
+            font-size: 28px;
+            cursor: pointer;
+            color: #ddd;
+            transition: 0.2s;
+            margin-right: 8px;
+        }
+
+        .rating-stars i.active, .rating-stars i:hover {
+            color: #f39c12;
+        }
+
+        .contributor-card {
+            text-align: center;
+            padding: 20px;
+            background: var(--contributor-bg);
+            border-radius: 12px;
+            margin: 10px;
+            transition: transform 0.3s;
+        }
+
+        .contributor-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px var(--shadow-color);
+        }
+
+        .contributor-card i {
+            font-size: 48px;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 40px;
+            padding: 20px 0;
+            text-align: center;
+            color: var(--text-primary);
+            opacity: 0.7;
+            font-size: 14px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-logo {
+            display: inline-block;
+            margin: 0 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        body.dark .footer-logo {
+            color: #3498db;
+        }
+
+        @media (max-width: 992px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                flex: auto;
+                position: static;
+            }
+            
+            .nav-menu {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 5px;
+                padding: 0 15px;
+            }
+            
+            .nav-item {
+                flex: 1 0 auto;
+                justify-content: center;
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                padding: 10px 15px;
+            }
+            
+            .nav-item.active {
+                border-left-color: transparent;
+                border-bottom-color: #3498db;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+            
+            .logo-section {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .pcce-logo-container {
+                border-right: none;
+                padding-right: 0;
+                border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+                padding-bottom: 20px;
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .virtual-labs-logo {
+                justify-content: center;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-container">
+            <div class="logo-section">
+                <div class="pcce-logo-container">
+                    <img src="https://raw.githubusercontent.com/dineshkute90/virtual_lab_LAUC/main/pccoe.png" 
+                         alt="PCOE Logo" 
+                         class="pcce-logo-img"
+                         id="pcceLogo"
+                         onerror="this.onerror=null; this.src='https://via.placeholder.com/60x60/2c3e50/ffffff?text=PCOE';">
+                    <div class="pcce-logo-text">
+                        <div class="main">APPLIED SCIENCES & HUMANITIES</div>
+                        <div class="sub">Pimpri Chinchwad College of Engineering</div>
+                    </div>
+                </div>
+                
+                <div class="virtual-labs-logo">
+                    <i class="fas fa-flask"></i>
+                    <h1>Virtual <span>Labs</span></h1>
+                </div>
+            </div>
+            
+            <div class="user-info">
+                <i class="fas fa-user-circle"></i>
+                <span>Welcome, Student</span>
+                <button id="themeToggleBtn" class="theme-toggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="container main-content">
+        <aside class="sidebar">
+            <h3><i class="fas fa-flask"></i> Jacobian Lab</h3>
+            <ul class="nav-menu">
+                <li class="nav-item active" data-tab="home"><i class="fas fa-home"></i> Home</li>
+                <li class="nav-item" data-tab="aim"><i class="fas fa-bullseye"></i> Aim</li>
+                <li class="nav-item" data-tab="theory"><i class="fas fa-book"></i> Theory</li>
+                <li class="nav-item" data-tab="pretest"><i class="fas fa-question-circle"></i> Pretest</li>
+                <li class="nav-item" data-tab="simulation"><i class="fas fa-desktop"></i> Simulation</li>
+                <li class="nav-item" data-tab="posttest"><i class="fas fa-clipboard-check"></i> Posttest</li>
+                <li class="nav-item" data-tab="references"><i class="fas fa-book-open"></i> References</li>
+                <li class="nav-item" data-tab="contributors"><i class="fas fa-users"></i> Contributors</li>
+                <li class="nav-item" data-tab="feedback"><i class="fas fa-comment-alt"></i> Feedback</li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <div class="content-header">
+                <h2>Virtual Lab on Jacobian Matrix</h2>
+                <p>Interactive Learning and Simulation Platform | Engineering Mathematics</p>
+            </div>
+            <div id="dynamicContent"></div>
+        </main>
+    </div>
+
+    <footer class="container">
+        <p>Virtual Labs &copy; 2025 | Applied Sciences & Humanities Department | 
+           <span class="footer-logo">Pimpri Chinchwad College of Engineering</span>
+        </p>
+    </footer>
+
+    <script>
+        // Dark/Light Mode Toggle
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        const themeIcon = themeToggleBtn.querySelector('i');
+        
+        if(localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
+        
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            if(document.body.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                localStorage.setItem('theme', 'light');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        });
+
+        const logoImg = document.getElementById('pcceLogo');
+        if(logoImg) {
+            logoImg.onerror = function() {
+                this.src = 'https://via.placeholder.com/60x60/2c3e50/ffffff?text=PCCoE';
+            };
+        }
+
+        // Helper function to convert string to proper LaTeX format
+        function toLatex(expr) {
+            if (!expr) return "";
+            let latex = expr;
+            latex = latex.replace(/\*\*/g, '^');
+            latex = latex.replace(/\^/g, '^{');
+            latex = latex.replace(/([a-z])\^\{/g, '$1^{');
+            let openBraces = (latex.match(/\{/g) || []).length;
+            let closeBraces = (latex.match(/\}/g) || []).length;
+            while (openBraces > closeBraces) {
+                latex += '}';
+                closeBraces++;
+            }
+            latex = latex.replace(/math\./g, '');
+            latex = latex.replace(/multiply/g, '');
+            return latex;
+        }
+
+        // Helper to parse expression and format for display
+        function formatExpression(expr) {
+            try {
+                let parsed = math.parse(expr);
+                let latex = parsed.toTex();
+                return latex;
+            } catch(e) {
+                return expr;
+            }
+        }
+
+        // Tab Navigation
+        const navItems = document.querySelectorAll('.nav-item');
+        const dynamicContent = document.getElementById('dynamicContent');
+
+        const contentMap = {
+            home: `
+                <div class="theory-content">
+                    <h3><i class="fas fa-graduation-cap"></i> Welcome to Jacobian Virtual Lab</h3>
+                    <p style="font-size:1.1rem; margin-top:20px;">Explore the fascinating world of <strong>Jacobian Matrix</strong> – the cornerstone of multivariable calculus, robotics, and machine learning.</p>
+                    <div class="grid-2">
+                        <div style="background:var(--step-bg); padding:25px; border-radius:12px; text-align:center;">
+                            <i class="fas fa-chart-line" style="font-size:48px; color:#3498db;"></i>
+                            <h4>Interactive Simulator</h4>
+                            <p>Solve step-by-step problems with scoring</p>
+                        </div>
+                        <div style="background:var(--step-bg); padding:25px; border-radius:12px; text-align:center;">
+                            <i class="fas fa-brain" style="font-size:48px; color:#3498db;"></i>
+                            <h4>Pretest & Posttest</h4>
+                            <p>Test your knowledge with MCQs</p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            aim: `
+                <div class="theory-content">
+                    <h3><i class="fas fa-bullseye"></i> Aim of the Experiment</h3>
+                    <div style="background:var(--formula-bg); padding:25px; border-radius:12px;">
+                        <p style="font-size:1.2rem;">"To study and understand the concept of <strong>Jacobian Matrix, Jacobian Determinant, and Jacobian Inverse</strong> and apply them in solving multivariable transformation problems."</p>
+                    </div>
+                </div>
+            `,
+            theory: `
+                <div class="theory-content">
+                    <h3><i class="fas fa-book"></i> Jacobian Matrix Theory</h3>
+                    <div class="formula-box">
+                        \\[ J = \\begin{bmatrix} \\frac{\\partial u}{\\partial x} & \\frac{\\partial u}{\\partial y} \\\\ \\frac{\\partial v}{\\partial x} & \\frac{\\partial v}{\\partial y} \\end{bmatrix} \\]
+                    </div>
+                    <p>The Jacobian determinant is: \\[ \\det(J) = \\frac{\\partial u}{\\partial x} \\cdot \\frac{\\partial v}{\\partial y} - \\frac{\\partial u}{\\partial y} \\cdot \\frac{\\partial v}{\\partial x} \\]</p>
+                </div>
+            `,
+            pretest: `
+                <div class="pretest-content" id="pretestContainer">
+                    <h3>Pretest: Jacobian Basics</h3>
+                    <div id="pretestQArea" style="background:var(--step-bg); padding:20px; border-radius:12px;">
+                        <p id="pretestQuestion"></p>
+                        <div id="pretestOptions"></div>
+                        <div style="margin-top:20px;">
+                            <button id="pretestPrevBtn" class="btn-primary">Previous</button>
+                            <button id="pretestNextBtn" class="btn-primary">Next</button>
+                            <button id="pretestSubmitBtn" class="btn-primary">Submit</button>
+                        </div>
+                    </div>
+                    <div id="pretestScoreMsg"></div>
+                </div>
+            `,
+            simulation: `
+                <div class="simulation-content">
+                    <h3><i class="fas fa-desktop"></i> Interactive Jacobian Simulator</h3>
+                    <p>Enter your own functions \\( u(x,y) \\) and \\( v(x,y) \\):</p>
+                    <div class="score-board" id="simScore">Score: 0</div>
+                    <div class="progress-bar"><div class="progress-fill" id="simProgress"></div></div>
+                    <div id="stepContainer"></div>
+                </div>
+            `,
+            posttest: `
+                <div class="posttest-content">
+                    <h3>Posttest: Jacobian Mastery</h3>
+                    <div id="posttestArea"></div>
+                    <button id="posttestGradeBtn" class="btn-primary">Submit Posttest</button>
+                    <div id="posttestResultCard"></div>
+                </div>
+            `,
+            references: `
+                <div class="references-content">
+                    <h3>References</h3>
+                    <ul><li>Higher Engineering Mathematics – B.S. Grewal</li><li>Advanced Engineering Mathematics – Erwin Kreyszig</li><li>MIT OpenCourseWare</li></ul>
+                </div>
+            `,
+            contributors: `
+                <div class="contributors-content">
+                    <h3>Contributors</h3>
+                    <div class="grid-2">
+                        <div class="contributor-card"><i class="fas fa-chalkboard-user"></i><h4>Mr. Ganesh Tarte</h4><p>Faculty Guide</p></div>
+                        <div class="contributor-card"><i class="fas fa-code"></i><h4>Pruthviraj Bankar</h4><p>Developer</p></div>
+                        <div class="contributor-card"><i class="fas fa-laptop-code"></i><h4>Anirudh Nair</h4><p>Developer</p></div>
+                        <div class="contributor-card"><i class="fas fa-database"></i><h4>Siddharth Shelke</h4><p>Developer</p></div>
+                    </div>
+                    <div style="margin-top:25px; padding:15px; background:var(--special-thanks-bg); border-radius:12px; text-align:center;">
+                        <strong>Special thanks to Mr. Ganesh Tarte</strong> for his invaluable guidance and support.
+                    </div>
+                </div>
+            `,
+            feedback: `
+                <div class="feedback-content-panel">
+                    <h3>Share Your Feedback</h3>
+                    <div class="rating-stars" id="starRating"><i class="far fa-star" data-value="1"></i><i class="far fa-star" data-value="2"></i><i class="far fa-star" data-value="3"></i><i class="far fa-star" data-value="4"></i><i class="far fa-star" data-value="5"></i></div>
+                    <textarea id="feedbackText" rows="4" placeholder="Your feedback..."></textarea>
+                    <button id="submitFeedbackBtn" class="btn-primary">Submit</button>
+                </div>
+            `
+        };
+
+        function switchTab(tabId) {
+            navItems.forEach(item => {
+                if(item.getAttribute('data-tab') === tabId) item.classList.add('active');
+                else item.classList.remove('active');
+            });
+            if(contentMap[tabId]) {
+                dynamicContent.innerHTML = contentMap[tabId];
+                if(window.MathJax) MathJax.typesetPromise();
+                if(tabId === 'pretest') initPretest();
+                if(tabId === 'simulation') initSimulation();
+                if(tabId === 'posttest') initPosttest();
+                if(tabId === 'feedback') initFeedback();
+            }
+        }
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => switchTab(item.getAttribute('data-tab')));
+        });
+
+        // Pretest
+        const pretestQuestions = [
+            { text: "The Jacobian matrix contains which type of derivatives?", options: ["Partial derivatives", "Ordinary derivatives", "Total derivatives"], correct: 0 },
+            { text: "If u = x + y, v = x - y, the Jacobian determinant equals?", options: ["2", "-2", "0"], correct: 1 },
+            { text: "For a square Jacobian matrix, determinant zero indicates:", options: ["Invertible", "Singular transformation", "Identity"], correct: 1 }
+        ];
+        let pretestAnswers = new Array(3).fill(null);
+        let pretestCurrent = 0;
+        
+        function initPretest() {
+            renderPretestQuestion();
+            document.getElementById('pretestPrevBtn')?.addEventListener('click', () => { if(pretestCurrent > 0) { pretestCurrent--; renderPretestQuestion(); } });
+            document.getElementById('pretestNextBtn')?.addEventListener('click', () => { if(pretestCurrent < 2) { pretestCurrent++; renderPretestQuestion(); } });
+            document.getElementById('pretestSubmitBtn')?.addEventListener('click', () => {
+                let correct = pretestAnswers.filter((a,i) => a === pretestQuestions[i].correct).length;
+                document.getElementById('pretestScoreMsg').innerHTML = correct > 2 ? '<div style="color:green;">Excellent! You know Jacobian well!</div>' : '<div style="color:orange;">Please study the theory again.</div>';
+            });
+        }
+        
+        function renderPretestQuestion() {
+            const q = pretestQuestions[pretestCurrent];
+            document.getElementById('pretestQuestion').innerHTML = `<strong>Q${pretestCurrent+1}:</strong> ${q.text}`;
+            const optsDiv = document.getElementById('pretestOptions');
+            optsDiv.innerHTML = '';
+            q.options.forEach((opt, idx) => {
+                optsDiv.innerHTML += `<label><input type="radio" name="pretestOpt" value="${idx}"> ${opt}</label><br>`;
+            });
+            document.querySelectorAll('input[name="pretestOpt"]').forEach(radio => {
+                radio.addEventListener('change', (e) => { pretestAnswers[pretestCurrent] = parseInt(e.target.value); });
+            });
+        }
+
+        // Simulation with proper symbolic conversion
+        let simStep = 0, simScore = 0;
+        let uExpr = "", vExpr = "";
+        let derivatives = { du_dx: "", du_dy: "", dv_dx: "", dv_dy: "" };
+        
+        function initSimulation() {
+            simStep = 0;
+            simScore = 0;
+            uExpr = "";
+            vExpr = "";
+            showFunctionInput();
+        }
+        
+        function showFunctionInput() {
+            document.getElementById('stepContainer').innerHTML = `
+                <div class="step-container">
+                    <h4>Step 1: Enter Functions</h4>
+                    <label>u(x, y) = </label>
+                    <input type="text" id="funcU" class="input-field" placeholder="e.g., x^2 - y^2" value="x^2 - y^2">
+                    <label style="margin-top:15px;">v(x, y) = </label>
+                    <input type="text" id="funcV" class="input-field" placeholder="e.g., 2*x*y" value="2*x*y">
+                    <button id="previewBtn" class="btn-primary" style="background:#6c5ce7;">Preview Symbolic</button>
+                    <button id="startBtn" class="btn-primary">Start Solving</button>
+                    <div id="previewArea" style="margin-top:15px;"></div>
+                </div>
+            `;
+            
+            document.getElementById('previewBtn')?.addEventListener('click', () => {
+                let u = document.getElementById('funcU').value;
+                let v = document.getElementById('funcV').value;
+                if(u && v) {
+                    let uLatex = formatExpression(u);
+                    let vLatex = formatExpression(v);
+                    document.getElementById('previewArea').innerHTML = `
+                        <div class="symbolic-preview">\\( u(x,y) = ${uLatex} \\)</div>
+                        <div class="symbolic-preview">\\( v(x,y) = ${vLatex} \\)</div>
+                    `;
+                    if(window.MathJax) MathJax.typesetPromise();
+                }
+            });
+            
+            document.getElementById('startBtn')?.addEventListener('click', () => {
+                uExpr = document.getElementById('funcU').value;
+                vExpr = document.getElementById('funcV').value;
+                if(uExpr && vExpr) {
+                    simStep = 1;
+                    updateSimulation();
+                }
+            });
+        }
+        
+        function updateSimulation() {
+            document.getElementById('simScore').innerHTML = `Score: ${simScore}`;
+            document.getElementById('simProgress').style.width = `${(simStep-1)/4 * 100}%`;
+            
+            if(simStep > 4) {
+                let total = 40;
+                let percent = (simScore/total)*100;
+                let msg = percent === 100 ? "🏆 Perfect! You're a Jacobian Master!" : 
+                          percent >= 75 ? "🌟 Excellent work!" :
+                          percent >= 50 ? "👍 Good job!" : "📚 Keep practicing!";
+                document.getElementById('stepContainer').innerHTML = `
+                    <div class="step-container" style="text-align:center;">
+                        <h3>🎉 Simulation Complete! 🎉</h3>
+                        <p>Score: ${simScore}/${total}</p>
+                        <p>${msg}</p>
+                        <button id="restartBtn" class="btn-primary">Try Another Function</button>
+                    </div>
+                `;
+                document.getElementById('restartBtn')?.addEventListener('click', () => initSimulation());
+                return;
+            }
+            
+            let title = "", question = "", hint = "", correct = "";
+            try {
+                if(simStep === 1) {
+                    title = "Step 2: Find ∂u/∂x";
+                    let node = math.parse(uExpr);
+                    let deriv = math.derivative(node, 'x');
+                    correct = deriv.toString();
+                    question = `For u = ${formatExpression(uExpr)}, find ∂u/∂x:`;
+                    hint = "Differentiate with respect to x, treating y as constant.";
+                } else if(simStep === 2) {
+                    title = "Step 3: Find ∂u/∂y";
+                    let node = math.parse(uExpr);
+                    let deriv = math.derivative(node, 'y');
+                    correct = deriv.toString();
+                    question = `For u = ${formatExpression(uExpr)}, find ∂u/∂y:`;
+                    hint = "Differentiate with respect to y, treating x as constant.";
+                } else if(simStep === 3) {
+                    title = "Step 4: Find ∂v/∂x";
+                    let node = math.parse(vExpr);
+                    let deriv = math.derivative(node, 'x');
+                    correct = deriv.toString();
+                    question = `For v = ${formatExpression(vExpr)}, find ∂v/∂x:`;
+                    hint = "Differentiate with respect to x, treating y as constant.";
+                } else if(simStep === 4) {
+                    title = "Step 5: Find ∂v/∂y";
+                    let node = math.parse(vExpr);
+                    let deriv = math.derivative(node, 'y');
+                    correct = deriv.toString();
+                    question = `For v = ${formatExpression(vExpr)}, find ∂v/∂y:`;
+                    hint = "Differentiate with respect to y, treating x as constant.";
+                }
+            } catch(e) {
+                document.getElementById('stepContainer').innerHTML = `<div class="step-container"><p style="color:red;">Error parsing functions. Please use valid expressions like x^2, x*y, sin(x), etc.</p><button id="backBtn" class="btn-primary">Go Back</button></div>`;
+                document.getElementById('backBtn')?.addEventListener('click', () => showFunctionInput());
+                return;
+            }
+            
+            let html = `<div class="step-container">
+                <h4>${title}</h4>
+                <div class="symbolic-preview">\\( u = ${formatExpression(uExpr)} \\), \\( v = ${formatExpression(vExpr)} \\)</div>
+                <p>${question}</p>
+                <input type="text" id="answerInput" class="input-field" placeholder="Enter your answer">
+                <button id="submitAnswer" class="btn-primary">Submit</button>
+                <button id="getHint" class="btn-hint">Hint (-3 points)</button>
+                <div id="stepMessage" style="margin-top:10px;"></div>
+            </div>`;
+            document.getElementById('stepContainer').innerHTML = html;
+            if(window.MathJax) MathJax.typesetPromise();
+            
+            let hintUsed = false;
+            document.getElementById('submitAnswer')?.addEventListener('click', () => {
+                let userAns = document.getElementById('answerInput').value.trim().toLowerCase().replace(/\s/g, '');
+                let correctAns = correct.toLowerCase().replace(/\s/g, '');
+                if(userAns === correctAns) {
+                    simScore += 10;
+                    document.getElementById('stepMessage').innerHTML = '<span style="color:green;">✓ Correct! +10 points</span>';
+                    simStep++;
+                    setTimeout(() => updateSimulation(), 1000);
+                } else {
+                    document.getElementById('stepMessage').innerHTML = `<span style="color:red;">✗ Wrong. Correct: ${correct}</span>`;
+                }
+            });
+            document.getElementById('getHint')?.addEventListener('click', () => {
+                if(!hintUsed) {
+                    simScore = Math.max(0, simScore - 3);
+                    document.getElementById('simScore').innerHTML = `Score: ${simScore}`;
+                    hintUsed = true;
+                }
+                document.getElementById('stepMessage').innerHTML = `<span style="color:orange;">💡 Hint: ${hint}</span>`;
+            });
+        }
+
+        // Posttest
+        const posttestBank = [
+            { text: "Jacobian matrix for polar coordinates (r,θ) has determinant?", options: ["r", "1", "r²"], correct: 0, marks: 2 },
+            { text: "If Jacobian determinant is non-zero, the transformation is:", options: ["Singular", "Locally invertible", "Degenerate"], correct: 1, marks: 2 }
+        ];
+        let postAnswers = new Array(2).fill(null);
+        
+        function initPosttest() {
+            let html = '';
+            posttestBank.forEach((q, idx) => {
+                html += `<div class="question-card"><p><strong>Q${idx+1}:</strong> ${q.text}</p>`;
+                q.options.forEach((opt, oidx) => {
+                    html += `<label><input type="radio" name="post_${idx}" value="${oidx}"> ${opt}</label><br>`;
+                });
+                html += `</div>`;
+            });
+            document.getElementById('posttestArea').innerHTML = html;
+            for(let i=0;i<2;i++) {
+                document.querySelectorAll(`input[name="post_${i}"]`).forEach(radio => {
+                    radio.addEventListener('change', (e) => { postAnswers[i] = parseInt(e.target.value); });
+                });
+            }
+            document.getElementById('posttestGradeBtn')?.addEventListener('click', () => {
+                let total = 0;
+                posttestBank.forEach((q, i) => { if(postAnswers[i] === q.correct) total += q.marks; });
+                document.getElementById('posttestResultCard').innerHTML = `<div class="formula-box">Score: ${total}/${posttestBank.length*2}</div>`;
+            });
+        }
+
+        // Feedback
+        let rating = 0;
+        function initFeedback() {
+            const stars = document.querySelectorAll('#starRating i');
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    rating = parseInt(star.getAttribute('data-value'));
+                    stars.forEach(s => { s.classList.remove('fas'); s.classList.add('far'); if(parseInt(s.getAttribute('data-value')) <= rating) { s.classList.remove('far'); s.classList.add('fas'); } });
+                });
+            });
+            document.getElementById('submitFeedbackBtn')?.addEventListener('click', () => {
+                if(rating > 0) alert(`Thank you for your ${rating}-star feedback!`);
+                else alert('Please select a rating.');
+            });
+        }
+        
+        switchTab('home');
+    </script>
+</body>
+</html>
